@@ -1,7 +1,7 @@
---Engineer     : Sumit Mondal
---Date         : 
---Name of file : buffer.vhd
---Description  : Buffer and buffer logic for input side of NoC Router
+//Engineer     : Sumit Mondal
+//Date         : 
+//Name of file : buffer.vhd
+//Description  : Buffer and buffer logic for input side of NoC Router
 
 
 module buffer
@@ -38,17 +38,17 @@ logic n_flits_next;
 
 
 // Sequential Logic
-always_ff @(posedge clk)
-begin:
- if (rst == 1)
-  begin
+always_ff @(posedge clk or posedge rst)
+begin
+ if (rst)
+ begin
   full <= 0;
   empty <= 1;
   buffer_on <= 1;
   read_ptr <= 0;
   write_ptr <= 0;
   n_flits <= 0;
-  end
+ end
  else
   begin
   full <= full_next;
@@ -58,15 +58,15 @@ begin:
   write_ptr <= write_ptr_next;
   n_flits <= n_flits_next;
    if ((~pop & push & ~full) | (pop & push))
-    buffer[write_ptr] = data_in;
+    buffer[write_ptr] = flit_in;
   end 
 end
 
 
 //Combinational Logic
 always_comb
-begin:
- data_o = memory[read_ptr];
+begin
+ flit_o = buffer[read_ptr];
  if (pop & ~push & ~empty)
  begin: read_check_empty
   if (read_ptr == BUFFER_SIZE - 1) 
@@ -79,7 +79,7 @@ begin:
     empty_next = 0;
   n_flits_next = n_flits - 1;
   write_ptr_next = write_ptr;
-  is_full_next = 0;
+  full_next = 0;
  end
  
  else if (~pop & push & ~full)
@@ -88,12 +88,12 @@ begin:
     write_ptr_next = 0;
    else
     write_ptr_next = write_ptr + 1;
-   if (write_ptr_next == read_ptr) begin
+   if (write_ptr_next == read_ptr)
     full_next = 1;
    else
     full_next = 0;
    empty_next = 0;
-   n_flits_next = n_flits + 1
+   n_flits_next = n_flits + 1;
    read_ptr_next = read_ptr;
  end
 
@@ -131,3 +131,5 @@ begin:
  end
 
 end
+
+endmodule
