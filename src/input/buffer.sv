@@ -114,11 +114,11 @@ begin
 
  else
  begin: no_read_or_write
-  full <= full_next;
-  empty <= empty_next;
-  read_ptr <= read_ptr_next;
-  write_ptr <= write_ptr_next;
-  n_flits <= n_flits_next;
+  full_next <= full;
+  empty_next <= empty;
+  read_ptr_next <= read_ptr;
+  write_ptr_next <= write_ptr;
+  n_flits_next <= n_flits;
  end
 
  begin:on_off_credit_system
